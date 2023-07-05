@@ -1,0 +1,60 @@
+import java.sql.Driver;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import org.bouncycastle.jcajce.provider.asymmetric.EC;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class BookMyShow {
+
+static {
+System.setProperty("webdriver.chrome.driver","./driver/chromedriver.exe");
+}
+
+public static void main(String[] args) throws InterruptedException {
+// TODO Auto-generated method stub
+    WebDriver driver=new ChromeDriver();
+    driver.get("https://in.bookmyshow.com/explore/home/");
+    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+driver.manage().window().maximize();
+   
+    driver.findElement(By.xpath("//span[@class='sc-hARARD hsHJDY'][normalize-space()='Bengaluru']")).click();
+    WebElement signInButton = driver.findElement(By.xpath("//div[@class='sc-iGPElx jsSlsO']"));
+    signInButton.click();
+   
+    driver.findElement(By.xpath("//div[contains(text(),'Continue with Email')]")).click();
+    driver.findElement(By.id("emailId")).sendKeys("seleniumauto@yopmail.com");
+    driver.findElement(By.xpath("//button[normalize-space()='Continue']")).click();
+    driver.get("http://www.yopmail.com");
+    driver.findElement(By.id("login")).sendKeys("seleniumauto@yopmail.com");
+    driver.findElement(By.xpath("//i[@class='material-icons-outlined f36']")).click();
+    driver.switchTo().frame("ifmail");
+    WebElement latestEmail = new WebDriverWait(driver, 10).until(
+            ExpectedConditions.presenceOfElementLocated(By.xpath("//table[@class='m_']//a[contains(text(), 'BookMyShow')]")));
+    latestEmail.click();
+   
+    driver.switchTo().defaultContent();
+    driver.switchTo().frame("ifmailcontent");
+    WebElement otpElement = new WebDriverWait(driver, 10).until(
+            ExpectedConditions.presenceOfElementLocated(By.xpath("//p[contains(text(), 'Your OTP is')]")));
+    String otp = otpElement.getText().split(":")[1].trim();
+    driver.switchTo().defaultContent();
+    driver.get("https://in.bookmyshow.com/explore/home/");
+    WebElement otpInput = new WebDriverWait(driver, 10).until(
+            ExpectedConditions.presenceOfElementLocated(By.id("otpInput")));
+    otpInput.sendKeys(otp);
+    WebElement hiGuestElement = new WebDriverWait(driver, 10).until(
+            ExpectedConditions.presenceOfElementLocated(By.xpath("//span[text()='Hi, Guest']")));
+    String hiGuestText = hiGuestElement.getText();
+    if (hiGuestText.equals("Hi, Guest")) {
+        System.out.println("User is successfully signed in.");
+    } else {
+        System.out.println("Sign-in failed.");
+    }
+    driver.quit();
+}}
